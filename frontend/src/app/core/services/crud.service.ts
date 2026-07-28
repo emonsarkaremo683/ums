@@ -81,8 +81,9 @@ export class CrudService {
   }
 
   customGet<T>(fullUrl: string): Observable<T> {
+    const url = fullUrl.startsWith('/') ? `${this.base}${fullUrl}` : `${this.base}/${fullUrl}`;
     return this.http
-      .get<ApiResponse<T>>(`${this.base}/${fullUrl}`)
+      .get<ApiResponse<T>>(url)
       .pipe(map((res) => res.data));
   }
 }

@@ -21,6 +21,7 @@ public class SscResultController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<SscResultResponse>> submit(
             @PathVariable Long applicantId, @Valid @RequestBody SscResultRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -28,11 +29,13 @@ public class SscResultController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<SscResultResponse>> getByApplicantId(@PathVariable Long applicantId) {
         return ResponseEntity.ok(ApiResponse.success(sscResultService.getByApplicantId(applicantId)));
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<SscResultResponse>> update(
             @PathVariable Long applicantId, @Valid @RequestBody SscResultRequest request) {
         return ResponseEntity.ok(ApiResponse.success("SSC result updated", sscResultService.update(applicantId, request)));

@@ -24,6 +24,9 @@ public class SslCommerzService {
     @Value("${sslcommerz.sandbox:true}")
     private boolean sandbox;
 
+    @Value("${app.frontend-url:http://localhost:4200}")
+    private String frontendUrl;
+
     private final RestTemplate restTemplate;
 
     public SslCommerzService(RestTemplate restTemplate) {
@@ -42,9 +45,9 @@ public class SslCommerzService {
         params.put("total_amount", amount);
         params.put("currency", currency);
         params.put("tran_id", transactionId);
-        params.put("success_url", "http://localhost:8085/api/payments/callback?transactionId=" + transactionId + "&status=SUCCESS");
-        params.put("fail_url", "http://localhost:8085/api/payments/callback?transactionId=" + transactionId + "&status=FAILED");
-        params.put("cancel_url", "http://localhost:8085/api/payments/callback?transactionId=" + transactionId + "&status=CANCELLED");
+        params.put("success_url", frontendUrl + "/payment/callback?transactionId=" + transactionId + "&status=SUCCESS");
+        params.put("fail_url", frontendUrl + "/payment/callback?transactionId=" + transactionId + "&status=FAILED");
+        params.put("cancel_url", frontendUrl + "/payment/callback?transactionId=" + transactionId + "&status=CANCELLED");
         params.put("emi_option", "0");
         params.put("cus_name", customerName);
         params.put("cus_email", customerEmail);

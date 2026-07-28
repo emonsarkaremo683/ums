@@ -223,6 +223,7 @@ export class DepartmentListComponent implements OnInit {
         this.confirmDelete.set(null);
         this.loadPage(this.currentPage());
       },
+      error: () => this.toast.error('Failed to deactivate department'),
     });
   }
 }

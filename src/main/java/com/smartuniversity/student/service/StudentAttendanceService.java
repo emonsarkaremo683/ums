@@ -31,7 +31,7 @@ public class StudentAttendanceService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
 
-        StudentAttendance attendance = attendanceRepository.findByStudentIdAndDate(student.getId(), LocalDate.now())
+        StudentAttendance attendance = attendanceRepository.findByStudentIdAndDateWithLock(student.getId(), LocalDate.now())
                 .orElse(StudentAttendance.builder()
                         .student(student)
                         .date(LocalDate.now())
@@ -48,7 +48,7 @@ public class StudentAttendanceService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
 
-        StudentAttendance attendance = attendanceRepository.findByStudentIdAndDate(student.getId(), LocalDate.now())
+        StudentAttendance attendance = attendanceRepository.findByStudentIdAndDateWithLock(student.getId(), LocalDate.now())
                 .orElseThrow(() -> new ResourceNotFoundException("Student Attendance", "date", LocalDate.now()));
 
         attendance.setCheckOutTime(LocalTime.now());

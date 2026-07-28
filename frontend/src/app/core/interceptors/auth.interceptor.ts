@@ -6,6 +6,10 @@ import { AuthService } from '../services/auth.service';
 let isRefreshing = false;
 const refreshTokenSubject = new Subject<string>();
 
+function resetRefreshState(): void {
+  isRefreshing = false;
+}
+
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
@@ -39,7 +43,7 @@ export const authInterceptor: HttpInterceptorFn = (
         isRefreshing = true;
         return auth.refreshToken().pipe(
           switchMap((res) => {
-            isRefreshing = false;
+            resetRefreshState();
             if (res.success) {
               const newToken = res.data.accessToken;
               refreshTokenSubject.next(newToken);
@@ -51,7 +55,7 @@ export const authInterceptor: HttpInterceptorFn = (
             return throwError(() => error);
           }),
           catchError((refreshError) => {
-            isRefreshing = false;
+            resetRefreshState();
             refreshTokenSubject.error(refreshError);
             auth.logout();
             return throwError(() => refreshError);

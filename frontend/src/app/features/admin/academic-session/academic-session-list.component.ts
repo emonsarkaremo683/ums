@@ -121,6 +121,8 @@ export class AcademicSessionListComponent implements OnInit {
     if (!item) return;
     this.crud.delete('academic-sessions', item.id).subscribe({
       next: () => { this.toast.success('Deleted'); this.confirmDelete.set(null); this.loadPage(this.currentPage()); },
+      error: () => this.toast.error('Failed to delete'),
+    });
     });
   }
 }

@@ -232,8 +232,14 @@ export class LeaveListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPage(0);
-    this.crud.listAll<Employee>('employees/active').subscribe({ next: (d) => this.employees.set(d) });
-    this.crud.listAll<LeaveType>('leave-requests/leave-types').subscribe({ next: (d) => this.leaveTypes.set(d) });
+    this.crud.listAll<Employee>('employees/active').subscribe({
+      next: (d) => this.employees.set(d),
+      error: () => this.toast.error('Failed to load employees'),
+    });
+    this.crud.listAll<LeaveType>('leave-requests/leave-types').subscribe({
+      next: (d) => this.leaveTypes.set(d),
+      error: () => this.toast.error('Failed to load leave types'),
+    });
   }
 
   loadPage(page: number): void {

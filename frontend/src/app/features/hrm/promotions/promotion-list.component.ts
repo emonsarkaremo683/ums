@@ -312,9 +312,18 @@ export class PromotionListComponent implements OnInit {
   }
 
   loadInitialData(): void {
-    this.crud.listAll('employees').subscribe({ next: (data) => this.employees.set(data || []) });
-    this.crud.listAll('designations').subscribe({ next: (data) => this.designations.set(data || []) });
-    this.crud.listAll('grades').subscribe({ next: (data) => this.grades.set(data || []) });
+    this.crud.listAll('employees').subscribe({
+      next: (data) => this.employees.set(data || []),
+      error: () => this.toast.error('Failed to load employees'),
+    });
+    this.crud.listAll('designations').subscribe({
+      next: (data) => this.designations.set(data || []),
+      error: () => this.toast.error('Failed to load designations'),
+    });
+    this.crud.listAll('grades').subscribe({
+      next: (data) => this.grades.set(data || []),
+      error: () => this.toast.error('Failed to load grades'),
+    });
   }
 
   loadPage(page: number): void {
@@ -432,6 +441,9 @@ export class PromotionListComponent implements OnInit {
         this.toast.success('Promotion deleted');
         this.confirmDelete.set(null);
         this.loadPage(this.currentPage());
+      },
+      error: () => this.toast.error('Failed to delete'),
+    });
       },
     });
   }

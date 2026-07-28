@@ -10,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class DesignationService {
 
@@ -41,6 +44,12 @@ public class DesignationService {
 
     public Page<DesignationResponse> getAll(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toResponse);
+    }
+
+    public List<DesignationResponse> getAllActive() {
+        return repository.findByActiveTrue().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional

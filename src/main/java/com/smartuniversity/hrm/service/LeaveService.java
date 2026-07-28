@@ -35,8 +35,12 @@ public class LeaveService {
     public Page<LeaveRequestResponse> list(Pageable pageable, String status) {
         Page<LeaveRequest> page;
         if (status != null && !status.isBlank()) {
-            LeaveStatus leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
-            page = leaveRequestRepository.findByStatus(leaveStatus, pageable);
+            try {
+                LeaveStatus leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
+                page = leaveRequestRepository.findByStatus(leaveStatus, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid leave status: " + status);
+            }
         } else {
             page = leaveRequestRepository.findAll(pageable);
         }
@@ -65,6 +69,8 @@ public class LeaveService {
         if (balance.getRemainingDays() < totalDays) {
             throw new BadRequestException("Insufficient leave balance. Remaining: " + balance.getRemainingDays());
         }
+        balance.setUsedDays(balance.getUsedDays() + totalDays);
+        leaveBalanceRepository.save(balance);
 
         LeaveRequest leaveRequest = LeaveRequest.builder()
                 .employee(employee)
@@ -75,6 +81,9 @@ public class LeaveService {
                 .reason(dto.getReason())
                 .build();
         leaveRequest = leaveRequestRepository.save(leaveRequest);
+
+        balance.setUsedDays(balance.getUsedDays() + leaveRequest.getTotalDays());
+        leaveBalanceRepository.save(balance);
 
         return toResponse(leaveRequest);
     }
@@ -89,23 +98,33 @@ public class LeaveService {
     public void approve(Long leaveId) {
         LeaveRequest leave = leaveRequestRepository.findById(leaveId)
                 .orElseThrow(() -> new ResourceNotFoundException("LeaveRequest", "id", leaveId));
+        if (leave.getStatus() != LeaveStatus.PENDING) {
+            throw new BadRequestException("Leave request is not in PENDING status");
+        }
         leave.setStatus(LeaveStatus.APPROVED);
         leaveRequestRepository.save(leave);
-
-        LeaveBalance balance = leaveBalanceRepository
-                .findByEmployeeIdAndLeaveType_IdAndYear(
-                        leave.getEmployee().getId(), leave.getLeaveType().getId(), leave.getStartDate().getYear())
-                .orElseThrow(() -> new ResourceNotFoundException("LeaveBalance"));
-        balance.setUsedDays(balance.getUsedDays() + leave.getTotalDays());
-        leaveBalanceRepository.save(balance);
     }
 
     @Transactional
     public void reject(Long leaveId) {
         LeaveRequest leave = leaveRequestRepository.findById(leaveId)
                 .orElseThrow(() -> new ResourceNotFoundException("LeaveRequest", "id", leaveId));
+        if (leave.getStatus() != LeaveStatus.PENDING) {
+            throw new BadRequestException("Leave request is not in PENDING status");
+        }
         leave.setStatus(LeaveStatus.REJECTED);
         leaveRequestRepository.save(leave);
+
+        LeaveBalance balance = leaveBalanceRepository
+                .findByEmployeeIdAndLeaveType_IdAndYear(
+                        leave.getEmployee().getId(), leave.getLeaveType().getId(), leave.getStartDate().getYear())
+                .orElseThrow(() -> new ResourceNotFoundException("LeaveBalance"));
+        balance.setUsedDays(Math.max(0, balance.getUsedDays() - leave.getTotalDays()));
+        leaveBalanceRepository.save(balance);
+    }
+
+    public List<LeaveType> listLeaveTypes() {
+        return leaveTypeRepository.findByActiveTrue();
     }
 
     private LeaveRequestResponse toResponse(LeaveRequest lr) {

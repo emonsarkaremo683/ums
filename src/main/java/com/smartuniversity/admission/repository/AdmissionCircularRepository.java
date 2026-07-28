@@ -11,4 +11,5 @@ public interface AdmissionCircularRepository extends JpaRepository<AdmissionCirc
     List<AdmissionCircular> findByActiveTrue();
     Page<AdmissionCircular> findByFacultyId(Long facultyId, Pageable pageable);
     List<AdmissionCircular> findBySessionAndActiveTrue(String session);
+    List<AdmissionCircular> findByFacultyIdAndSessionAndActiveTrue(Long facultyId, String session);
 }

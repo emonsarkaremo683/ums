@@ -8,10 +8,11 @@ import com.smartuniversity.common.exception.BadRequestException;
 import com.smartuniversity.common.exception.ResourceNotFoundException;
 import com.smartuniversity.student.entity.Student;
 import com.smartuniversity.student.repository.StudentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +53,11 @@ public class StudentResultService {
         AcademicSession session = sessionRepository.findById(request.getAcademicSessionId())
                 .orElseThrow(() -> new ResourceNotFoundException("AcademicSession", "id", request.getAcademicSessionId()));
 
+        if (resultRepository.findByStudentIdAndCourseIdAndAcademicSessionId(
+                request.getStudentId(), request.getCourseId(), request.getAcademicSessionId()).isPresent()) {
+            throw new BadRequestException("Result already exists for this student, course, and session");
+        }
+
         StudentResult result = StudentResult.builder()
                 .student(student)
                 .course(course)
@@ -62,6 +68,10 @@ public class StudentResultService {
                 .build();
         result = resultRepository.save(result);
         return resultMapper.toResponse(result);
+    }
+
+    public Page<StudentResultResponse> getAll(Pageable pageable) {
+        return resultRepository.findAll(pageable).map(resultMapper::toResponse);
     }
 
     public List<StudentResultResponse> getByStudentAndSession(Long studentId, Long sessionId) {
@@ -136,16 +146,4 @@ public class StudentResultService {
         studentRepository.save(student);
     }
 
-    private String calculateLetterGrade(double gradePoint) {
-        if (gradePoint >= 4.0) return "A+";
-        if (gradePoint >= 3.75) return "A";
-        if (gradePoint >= 3.5) return "A-";
-        if (gradePoint >= 3.25) return "B+";
-        if (gradePoint >= 3.0) return "B";
-        if (gradePoint >= 2.75) return "B-";
-        if (gradePoint >= 2.5) return "C+";
-        if (gradePoint >= 2.25) return "C";
-        if (gradePoint >= 2.0) return "D";
-        return "F";
-    }
 }

@@ -51,8 +51,7 @@ public class AdmissionCircularService {
     }
 
     public List<AdmissionCircularResponse> getByFacultyAndSession(Long facultyId, String session) {
-        return circularRepository.findBySessionAndActiveTrue(session).stream()
-                .filter(c -> c.getFaculty().getId().equals(facultyId))
+        return circularRepository.findByFacultyIdAndSessionAndActiveTrue(facultyId, session).stream()
                 .map(circularMapper::toResponse)
                 .collect(Collectors.toList());
     }

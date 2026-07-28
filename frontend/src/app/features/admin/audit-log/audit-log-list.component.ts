@@ -50,7 +50,7 @@ export class AuditLogListComponent implements OnInit {
     this.loading.set(true);
     this.crud.list<AuditLog>('audit-logs', page, 20).subscribe({
       next: (d) => { this.rows.set(d.content); this.currentPage.set(d.number); this.totalPages.set(d.totalPages); this.totalElements.set(d.totalElements); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      error: () => { this.toast.error('Failed to load audit logs'); this.loading.set(false); },
     });
   }
 }

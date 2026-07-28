@@ -75,7 +75,7 @@ public class MeritListService {
 
     @Transactional
     public void publish(Long circularId) {
-        List<MeritList> entries = meritListRepository.findByCircularIdAndPublishedTrue(circularId);
+        List<MeritList> entries = meritListRepository.findByCircularIdAndPublishedFalse(circularId);
         if (entries.isEmpty()) {
             throw new BadRequestException("No merit list generated for this circular");
         }

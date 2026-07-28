@@ -1,10 +1,12 @@
 package com.smartuniversity.admission.dto;
 
 import com.smartuniversity.common.enums.Gender;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class ApplicantRequest {
@@ -33,4 +35,13 @@ public class ApplicantRequest {
     private Long circularId;
 
     private Long preferredDepartmentId;
+
+    @Valid
+    private SscResultRequest sscResult;
+
+    @Valid
+    private HscResultRequest hscResult;
+
+    @Valid
+    private List<ApplicantDocumentInput> documents;
 }

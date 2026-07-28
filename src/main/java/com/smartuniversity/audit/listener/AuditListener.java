@@ -7,7 +7,12 @@ import jakarta.persistence.PreUpdate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AuditListener {
+
+    private static final Logger log = LoggerFactory.getLogger(AuditListener.class);
 
     @PrePersist
     public void prePersist(Object entity) {
@@ -29,7 +34,7 @@ public class AuditListener {
             email = user.getUsername();
         }
 
-        AuditLog log = AuditLog.builder()
+        AuditLog auditLog = AuditLog.builder()
                 .entityType(entity.getClass().getSimpleName())
                 .action(action)
                 .performedBy(email)
@@ -39,9 +44,10 @@ public class AuditListener {
         try {
             AuditLogRepository repo = SpringContextUtil.getBean(AuditLogRepository.class);
             if (repo != null) {
-                repo.save(log);
+                repo.save(auditLog);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to create audit log: {}", e.getMessage());
         }
     }
 }

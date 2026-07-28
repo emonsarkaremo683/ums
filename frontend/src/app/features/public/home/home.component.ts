@@ -270,6 +270,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.crud.list<Circular>('admission-circulars', 0, 6, undefined, { active: 'true' }).subscribe({
       next: (d) => this.activeCirculars.set(d.content.filter(c => c.active)),
+      error: () => this.toast.error('Failed to load circulars'),
     });
   }
 }

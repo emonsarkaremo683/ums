@@ -16,8 +16,13 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ApplicantDocumentService {
+
+    private static final Logger log = LoggerFactory.getLogger(ApplicantDocumentService.class);
 
     private final ApplicantDocumentRepository documentRepository;
     private final ApplicantRepository applicantRepository;
@@ -63,7 +68,8 @@ public class ApplicantDocumentService {
         Path filePath = Paths.get(document.getFileUrl());
         try {
             Files.deleteIfExists(filePath);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to delete file {} for document {}: {}", filePath, documentId, e.getMessage());
         }
         documentRepository.delete(document);
     }

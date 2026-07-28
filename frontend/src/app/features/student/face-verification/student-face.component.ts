@@ -165,6 +165,9 @@ export class StudentFaceComponent {
           this.isEnrolled.set(res.data.enrolled);
         }
       },
+      error: () => {
+        this.toast.error('Failed to load enrollment status');
+      },
     });
   }
 

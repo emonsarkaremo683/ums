@@ -6,6 +6,8 @@ import com.smartuniversity.common.exception.ResourceNotFoundException;
 import com.smartuniversity.hrm.dto.*;
 import com.smartuniversity.hrm.entity.*;
 import com.smartuniversity.hrm.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,10 @@ public class ApprovalWorkflowService {
         return workflowRepository.findByEntityTypeAndEntityId(entityType, entityId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Page<ApprovalWorkflowResponse> getAll(Pageable pageable) {
+        return workflowRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional

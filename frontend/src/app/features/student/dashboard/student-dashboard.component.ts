@@ -210,7 +210,7 @@ export class StudentDashboardComponent implements OnInit {
           this.completedCourses.set(data.reduce((sum, r) => sum + (r.totalCredits || 0), 0));
         }
       },
-      error: () => {},
+      error: () => { this.toast.error('Failed to load year results'); },
     });
   }
 }

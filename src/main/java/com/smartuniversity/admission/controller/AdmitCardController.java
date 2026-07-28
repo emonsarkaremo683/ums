@@ -27,6 +27,7 @@ public class AdmitCardController {
     }
 
     @GetMapping("/applicant/{applicantId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<AdmitCardResponse>> getByApplicant(@PathVariable Long applicantId) {
         return ResponseEntity.ok(ApiResponse.success(admitCardService.getByApplicantId(applicantId)));
     }

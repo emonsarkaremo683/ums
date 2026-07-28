@@ -44,12 +44,11 @@ public class PayrollService {
 
     @Transactional
     public PayrollRun runPayroll(String month, int year) {
-        payrollRunRepository.findByMonthAndYear(month, year)
-                .ifPresent(r -> { throw new BadRequestException("Payroll already run for " + month + " " + year); });
+        if (payrollRunRepository.findByMonthAndYear(month, year).isPresent()) {
+            throw new BadRequestException("Payroll already run for " + month + " " + year);
+        }
 
-        List<Employee> activeEmployees = employeeRepository.findAll().stream()
-                .filter(Employee::isActive)
-                .toList();
+        List<Employee> activeEmployees = employeeRepository.findByActiveTrue();
 
         PayrollRun payrollRun = PayrollRun.builder()
                 .month(month)
@@ -63,10 +62,7 @@ public class PayrollService {
         for (Employee emp : activeEmployees) {
             if (emp.getGrade() == null) continue;
 
-            SalaryStructure structure = salaryStructureRepository.findAll().stream()
-                    .filter(s -> s.getGrade().getId().equals(emp.getGrade().getId()))
-                    .findFirst()
-                    .orElse(null);
+            SalaryStructure structure = salaryStructureRepository.findByGradeId(emp.getGrade().getId()).orElse(null);
             if (structure == null) continue;
 
             BigDecimal gross = structure.getBasicSalary()

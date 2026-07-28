@@ -47,6 +47,7 @@ public class ApplicantDocumentController {
     }
 
     @GetMapping("/applicant/{applicantId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<List<ApplicantDocumentResponse>>> getByApplicantId(
             @PathVariable Long applicantId) {
         return ResponseEntity.ok(ApiResponse.success(documentService.getByApplicantId(applicantId)));

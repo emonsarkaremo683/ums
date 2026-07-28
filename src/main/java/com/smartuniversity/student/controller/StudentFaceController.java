@@ -64,9 +64,18 @@ public class StudentFaceController {
     public ResponseEntity<ApiResponse<StudentFaceVerifyResponse>> verifyAndCheckIn(
             @Valid @RequestBody StudentFaceVerifyRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userDetails.getUsername()));
+        Student authenticatedStudent = studentRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "userId", user.getId()));
+
         StudentFaceVerifyResponse response = studentFaceService.verifyFace(request.getBase64Image());
         if (!response.isMatched()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(response.getMessage()));
+        }
+        if (!authenticatedStudent.getId().equals(response.getStudentId())) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Face does not match your enrolled face"));
         }
         studentAttendanceService.checkIn(response.getStudentId());
         return ResponseEntity.ok(ApiResponse.success("Face verified and checked in", response));

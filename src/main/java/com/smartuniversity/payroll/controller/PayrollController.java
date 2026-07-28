@@ -75,6 +75,7 @@ public class PayrollController {
     }
 
     @GetMapping("/runs/{runId}/payslips")
+    @PreAuthorize("hasRole('PAYROLL') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<PayslipResponse>>> getPayslipsByRun(@PathVariable Long runId) {
         List<PayslipResponse> payslips = payrollService.getPayslipsByRun(runId).stream()
                 .map(payrollMapper::toPayslipResponse)
@@ -83,6 +84,7 @@ public class PayrollController {
     }
 
     @GetMapping("/employee/{employeeId}/payslips")
+    @PreAuthorize("hasRole('PAYROLL') or hasRole('ADMIN') or @resourceSecurity.isEmployeeOwner(#employeeId)")
     public ResponseEntity<ApiResponse<List<PayslipResponse>>> getPayslipsByEmployee(@PathVariable Long employeeId) {
         List<PayslipResponse> payslips = payrollService.getPayslipsByEmployee(employeeId).stream()
                 .map(payrollMapper::toPayslipResponse)

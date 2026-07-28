@@ -117,6 +117,8 @@ export class DesignationListComponent implements OnInit {
     if (!item) return;
     this.crud.delete('designations', item.id).subscribe({
       next: () => { this.toast.success('Deleted'); this.confirmDelete.set(null); this.loadPage(this.currentPage()); },
+      error: () => this.toast.error('Failed to delete'),
+    });
     });
   }
 }

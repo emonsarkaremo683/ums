@@ -128,6 +128,12 @@ export class PayrollRunComponent implements OnInit {
         this.running.set(false);
         this.loadPage(0);
       },
+      error: () => {
+        this.toast.error('Payroll execution failed');
+        this.running.set(false);
+      },
+    });
+      },
       error: (err) => {
         this.running.set(false);
         this.toast.error(err?.error?.message || 'Failed to execute payroll');

@@ -37,6 +37,7 @@ public class FaceDetector {
         Mat image = imdecode(imageData, IMREAD_COLOR);
 
         if (image.empty()) {
+            imageData.close();
             return Optional.empty();
         }
 
@@ -56,6 +57,10 @@ public class FaceDetector {
         );
 
         if (faces.empty()) {
+            gray.close();
+            faces.close();
+            image.close();
+            imageData.close();
             return Optional.empty();
         }
 
@@ -64,6 +69,8 @@ public class FaceDetector {
 
         gray.close();
         faces.close();
+        image.close();
+        imageData.close();
 
         return Optional.of(face);
     }
@@ -74,6 +81,7 @@ public class FaceDetector {
         Mat image = imdecode(imageData, IMREAD_COLOR);
 
         if (image.empty()) {
+            imageData.close();
             return Optional.empty();
         }
 
@@ -93,6 +101,10 @@ public class FaceDetector {
         );
 
         if (faces.empty()) {
+            gray.close();
+            faces.close();
+            image.close();
+            imageData.close();
             return Optional.empty();
         }
 
@@ -101,6 +113,8 @@ public class FaceDetector {
 
         gray.close();
         faces.close();
+        image.close();
+        imageData.close();
 
         return Optional.of(result);
     }

@@ -7,7 +7,9 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "payroll_runs")
+@Table(name = "payroll_runs", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"month", "year"})
+})
 @Getter
 @Setter
 @NoArgsConstructor

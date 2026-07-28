@@ -52,9 +52,17 @@ interface Department { id: number; name: string; code: string; facultyId: number
                 Back to Circulars
               </a>
               <div class="circular-info">
-                <span class="badge badge-success">Active</span>
                 <h2>{{ circular()!.title }}</h2>
                 <p class="info-meta">{{ circular()!.facultyName }}</p>
+                <div class="status-badge">
+                  @if (registrationStatus() === 'active') {
+                    <span class="badge badge-success">Active</span>
+                  } @else if (registrationStatus() === 'closed') {
+                    <span class="badge badge-danger">Registration Closed</span>
+                  } @else {
+                    <span class="badge badge-warning">Inactive</span>
+                  }
+                </div>
                 <div class="info-details">
                   <div class="info-row"><span class="info-label">Session</span><span class="info-value">{{ circular()!.session }}</span></div>
                   <div class="info-row"><span class="info-label">Seats</span><span class="info-value">{{ circular()!.totalSeats }}</span></div>
@@ -65,6 +73,9 @@ interface Department { id: number; name: string; code: string; facultyId: number
             </div>
 
             <div class="apply-form-card">
+              @if (!isRegistrationOpen()) {
+                <div class="alert alert-warning">Registration for this circular has closed. You cannot submit a new application.</div>
+              }
               <h2 class="form-title">Application Form</h2>
               <form class="apply-form" (ngSubmit)="submit()">
                 <div class="form-section">
@@ -122,7 +133,7 @@ interface Department { id: number; name: string; code: string; facultyId: number
                 </div>
 
                 <div class="form-footer">
-                  <button type="submit" class="btn btn-gold" [disabled]="!isValid() || saving()">
+                  <button type="submit" class="btn btn-gold" [disabled]="!isValid() || saving() || !isRegistrationOpen()">
                     @if (saving()) {
                       <span class="spinner-sm"></span> Submitting...
                     } @else {
@@ -315,6 +326,24 @@ export class ApplyComponent implements OnInit {
     phone: '', gender: '', dateOfBirth: '',
     address: '', circularId: 0, preferredDepartmentId: null,
   };
+
+  isRegistrationOpen() {
+    const circular = this.circular();
+    if (!circular) return false;
+    if (!circular.active) return false;
+    const today = new Date();
+    const endDate = new Date(circular.registrationEndDate);
+    return today <= endDate;
+  }
+
+  registrationStatus(): string {
+    const circular = this.circular();
+    if (!circular) return 'unknown';
+    if (!circular.active) return 'inactive';
+    const today = new Date();
+    const endDate = new Date(circular.registrationEndDate);
+    return today <= endDate ? 'active' : 'closed';
+  }
 
   constructor(
     private route: ActivatedRoute,

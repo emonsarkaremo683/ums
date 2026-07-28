@@ -5,7 +5,6 @@ import com.smartuniversity.admission.dto.ApplicantResponse;
 import com.smartuniversity.admission.entity.Applicant;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ApplicantMapper {
@@ -14,6 +13,9 @@ public interface ApplicantMapper {
     @Mapping(target = "circularTitle", source = "circular.title")
     @Mapping(target = "preferredDepartmentId", expression = "java(applicant.getPreferredDepartment() != null ? applicant.getPreferredDepartment().getId() : null)")
     @Mapping(target = "preferredDepartmentName", expression = "java(applicant.getPreferredDepartment() != null ? applicant.getPreferredDepartment().getName() : null)")
+    @Mapping(target = "sscResult", ignore = true)
+    @Mapping(target = "hscResult", ignore = true)
+    @Mapping(target = "documents", ignore = true)
     ApplicantResponse toResponse(Applicant applicant);
 
     @Mapping(target = "circular", ignore = true)
@@ -25,6 +27,4 @@ public interface ApplicantMapper {
     @Mapping(target = "applicationNumber", ignore = true)
     @Mapping(target = "meritScore", ignore = true)
     Applicant toEntity(ApplicantRequest request);
-
-    void updateFromRequest(ApplicantRequest request, @MappingTarget Applicant applicant);
 }

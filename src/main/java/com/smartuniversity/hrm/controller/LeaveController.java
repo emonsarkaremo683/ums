@@ -1,11 +1,9 @@
 package com.smartuniversity.hrm.controller;
 
 import com.smartuniversity.common.ApiResponse;
-import com.smartuniversity.common.enums.LeaveStatus;
 import com.smartuniversity.hrm.dto.*;
 import com.smartuniversity.hrm.entity.LeaveType;
 import com.smartuniversity.hrm.service.LeaveService;
-import com.smartuniversity.hrm.repository.LeaveTypeRepository;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,14 +20,13 @@ import java.util.List;
 public class LeaveController {
 
     private final LeaveService leaveService;
-    private final LeaveTypeRepository leaveTypeRepository;
 
-    public LeaveController(LeaveService leaveService, LeaveTypeRepository leaveTypeRepository) {
+    public LeaveController(LeaveService leaveService) {
         this.leaveService = leaveService;
-        this.leaveTypeRepository = leaveTypeRepository;
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('HR') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<LeaveRequestResponse>>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -40,7 +37,7 @@ public class LeaveController {
 
     @GetMapping("/leave-types")
     public ResponseEntity<ApiResponse<List<LeaveType>>> listLeaveTypes() {
-        return ResponseEntity.ok(ApiResponse.success(leaveTypeRepository.findByActiveTrue()));
+        return ResponseEntity.ok(ApiResponse.success(leaveService.listLeaveTypes()));
     }
 
     @PostMapping
@@ -50,6 +47,7 @@ public class LeaveController {
     }
 
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasRole('HR') or hasRole('ADMIN') or @resourceSecurity.isEmployeeOwner(#employeeId)")
     public ResponseEntity<ApiResponse<List<LeaveRequestResponse>>> getByEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(ApiResponse.success(leaveService.getByEmployee(employeeId)));
     }

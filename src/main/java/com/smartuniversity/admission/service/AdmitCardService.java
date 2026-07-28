@@ -37,10 +37,9 @@ public class AdmitCardService {
             throw new BadRequestException("Payment not completed. Cannot generate admit card.");
         }
 
-        admitCardRepository.findByApplicantId(applicantId)
-                .ifPresent(card -> {
-                    throw new BadRequestException("Admit card already generated for this applicant");
-                });
+        if (admitCardRepository.findByApplicantId(applicantId).isPresent()) {
+            throw new BadRequestException("Admit card already generated for this applicant");
+        }
 
         AdmitCard admitCard = AdmitCard.builder()
                 .applicant(applicant)

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
     Optional<Applicant> findByUserId(Long userId);
+    Optional<Applicant> findByUserIdAndCircularId(Long userId, Long circularId);
     Optional<Applicant> findByApplicationNumber(String applicationNumber);
     Page<Applicant> findByCircularId(Long circularId, Pageable pageable);
     Page<Applicant> findByCircularIdAndStatus(Long circularId, AdmissionStatus status, Pageable pageable);

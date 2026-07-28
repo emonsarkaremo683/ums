@@ -5,6 +5,8 @@ import com.smartuniversity.common.exception.ResourceNotFoundException;
 import com.smartuniversity.hrm.dto.*;
 import com.smartuniversity.hrm.entity.*;
 import com.smartuniversity.hrm.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +74,10 @@ public class PromotionService {
         return promotionRepository.findByEmployeeId(employeeId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Page<PromotionResponse> getAll(Pageable pageable) {
+        return promotionRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional

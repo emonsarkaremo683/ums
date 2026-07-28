@@ -77,6 +77,9 @@ public class StudentFaceService {
         Mat face = faceOpt.get();
         float[] inputEncoding = faceEncoder.encodeFace(face);
 
+        // TODO: Performance — brute-force scan of all face encodings. For production scale,
+        // consider using a vector similarity search (e.g., pgvector, FAISS, or a dedicated
+        // face recognition service) instead of loading all encodings into memory.
         List<StudentFaceData> allFaces = faceDataRepository.findAll();
 
         double bestDistance = Double.MAX_VALUE;

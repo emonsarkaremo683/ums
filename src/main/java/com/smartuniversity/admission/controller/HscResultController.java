@@ -21,6 +21,7 @@ public class HscResultController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<HscResultResponse>> submit(
             @PathVariable Long applicantId, @Valid @RequestBody HscResultRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -28,11 +29,13 @@ public class HscResultController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<HscResultResponse>> getByApplicantId(@PathVariable Long applicantId) {
         return ResponseEntity.ok(ApiResponse.success(hscResultService.getByApplicantId(applicantId)));
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMISSION') or @resourceSecurity.isApplicantOwner(#applicantId)")
     public ResponseEntity<ApiResponse<HscResultResponse>> update(
             @PathVariable Long applicantId, @Valid @RequestBody HscResultRequest request) {
         return ResponseEntity.ok(ApiResponse.success("HSC result updated", hscResultService.update(applicantId, request)));

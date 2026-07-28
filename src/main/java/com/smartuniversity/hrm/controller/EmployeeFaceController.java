@@ -7,6 +7,7 @@ import com.smartuniversity.hrm.dto.FaceVerifyRequest;
 import com.smartuniversity.hrm.dto.FaceVerifyResponse;
 import com.smartuniversity.hrm.entity.Employee;
 import com.smartuniversity.hrm.repository.EmployeeRepository;
+import com.smartuniversity.hrm.service.AttendanceService;
 import com.smartuniversity.hrm.service.EmployeeFaceService;
 import com.smartuniversity.security.entity.User;
 import com.smartuniversity.security.repository.UserRepository;
@@ -26,11 +27,14 @@ public class EmployeeFaceController {
     private final EmployeeFaceService employeeFaceService;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final AttendanceService attendanceService;
 
-    public EmployeeFaceController(EmployeeFaceService employeeFaceService, UserRepository userRepository, EmployeeRepository employeeRepository) {
+    public EmployeeFaceController(EmployeeFaceService employeeFaceService, UserRepository userRepository,
+                                   EmployeeRepository employeeRepository, AttendanceService attendanceService) {
         this.employeeFaceService = employeeFaceService;
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;
+        this.attendanceService = attendanceService;
     }
 
     @PostMapping("/enroll")
@@ -62,7 +66,8 @@ public class EmployeeFaceController {
         if (!response.isMatched()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(response.getMessage()));
         }
-        return ResponseEntity.ok(ApiResponse.success("Face verified for check-in", response));
+        attendanceService.checkInByEmployeeId(response.getEmployeeId());
+        return ResponseEntity.ok(ApiResponse.success("Face verified and checked in", response));
     }
 
     @PostMapping("/verify-check-out")
@@ -73,7 +78,8 @@ public class EmployeeFaceController {
         if (!response.isMatched()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(response.getMessage()));
         }
-        return ResponseEntity.ok(ApiResponse.success("Face verified for check-out", response));
+        attendanceService.checkOutByEmployeeId(response.getEmployeeId());
+        return ResponseEntity.ok(ApiResponse.success("Face verified and checked out", response));
     }
 
     @GetMapping("/status")

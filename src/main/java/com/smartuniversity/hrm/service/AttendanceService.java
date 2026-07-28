@@ -26,60 +26,28 @@ public class AttendanceService {
     public AttendanceResponse checkIn(AttendanceRequest request) {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", request.getEmployeeId()));
-
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
-                .orElse(Attendance.builder()
-                        .employee(employee)
-                        .date(LocalDate.now())
-                        .build());
-
-        attendance.setCheckInTime(request.getCheckInTime());
-        attendance.setStatus(com.smartuniversity.common.enums.AttendanceStatus.PRESENT);
-        attendance = attendanceRepository.save(attendance);
-        return toResponse(attendance);
+        return doCheckIn(employee, request.getCheckInTime());
     }
 
     @Transactional
     public AttendanceResponse checkInForUser(Long userId, AttendanceRequest request) {
         Employee employee = employeeRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "userId", userId));
-
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
-                .orElse(Attendance.builder()
-                        .employee(employee)
-                        .date(LocalDate.now())
-                        .build());
-
-        attendance.setCheckInTime(request.getCheckInTime());
-        attendance.setStatus(com.smartuniversity.common.enums.AttendanceStatus.PRESENT);
-        attendance = attendanceRepository.save(attendance);
-        return toResponse(attendance);
+        return doCheckIn(employee, request.getCheckInTime());
     }
 
     @Transactional
     public AttendanceResponse checkOut(AttendanceRequest request) {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", request.getEmployeeId()));
-
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
-                .orElseThrow(() -> new ResourceNotFoundException("Attendance", "date", LocalDate.now()));
-
-        attendance.setCheckOutTime(request.getCheckOutTime());
-        attendance = attendanceRepository.save(attendance);
-        return toResponse(attendance);
+        return doCheckOut(employee, request.getCheckOutTime());
     }
 
     @Transactional
     public AttendanceResponse checkOutForUser(Long userId, AttendanceRequest request) {
         Employee employee = employeeRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "userId", userId));
-
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
-                .orElseThrow(() -> new ResourceNotFoundException("Attendance", "date", LocalDate.now()));
-
-        attendance.setCheckOutTime(request.getCheckOutTime());
-        attendance = attendanceRepository.save(attendance);
-        return toResponse(attendance);
+        return doCheckOut(employee, request.getCheckOutTime());
     }
 
     public List<AttendanceResponse> getByEmployeeAndDateRange(Long employeeId, LocalDate start, LocalDate end) {
@@ -92,28 +60,32 @@ public class AttendanceService {
     public AttendanceResponse checkInByEmployeeId(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
-
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
-                .orElse(Attendance.builder()
-                        .employee(employee)
-                        .date(LocalDate.now())
-                        .build());
-
-        attendance.setCheckInTime(java.time.LocalTime.now());
-        attendance.setStatus(com.smartuniversity.common.enums.AttendanceStatus.PRESENT);
-        attendance = attendanceRepository.save(attendance);
-        return toResponse(attendance);
+        return doCheckIn(employee, java.time.LocalTime.now());
     }
 
     @Transactional
     public AttendanceResponse checkOutByEmployeeId(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+        return doCheckOut(employee, java.time.LocalTime.now());
+    }
 
-        Attendance attendance = attendanceRepository.findByEmployeeIdAndDate(employee.getId(), LocalDate.now())
+    private AttendanceResponse doCheckIn(Employee employee, java.time.LocalTime time) {
+        Attendance attendance = attendanceRepository.findByEmployeeIdAndDateWithLock(employee.getId(), LocalDate.now())
+                .orElse(Attendance.builder()
+                        .employee(employee)
+                        .date(LocalDate.now())
+                        .build());
+        attendance.setCheckInTime(time);
+        attendance.setStatus(com.smartuniversity.common.enums.AttendanceStatus.PRESENT);
+        attendance = attendanceRepository.save(attendance);
+        return toResponse(attendance);
+    }
+
+    private AttendanceResponse doCheckOut(Employee employee, java.time.LocalTime time) {
+        Attendance attendance = attendanceRepository.findByEmployeeIdAndDateWithLock(employee.getId(), LocalDate.now())
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance", "date", LocalDate.now()));
-
-        attendance.setCheckOutTime(java.time.LocalTime.now());
+        attendance.setCheckOutTime(time);
         attendance = attendanceRepository.save(attendance);
         return toResponse(attendance);
     }

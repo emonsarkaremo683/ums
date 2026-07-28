@@ -141,11 +141,12 @@ export class StudentAttendanceComponent implements OnInit {
       return;
     }
 
-    let params = `studentId=${userId}`;
-    if (this.startDate) params += `&start=${this.startDate}`;
-    if (this.endDate) params += `&end=${this.endDate}`;
+    const params = new URLSearchParams();
+    params.set('studentId', String(userId));
+    if (this.startDate) params.set('start', this.startDate);
+    if (this.endDate) params.set('end', this.endDate);
 
-    this.crud.listAll<AttendanceRecord>(`student/attendance?${params}`).subscribe({
+    this.crud.listAll<AttendanceRecord>(`student/attendance?${params.toString()}`).subscribe({
       next: (data) => {
         this.records.set(data || []);
         this.presentCount.set((data || []).filter(r => r.status === 'PRESENT').length);

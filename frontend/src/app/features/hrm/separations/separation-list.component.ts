@@ -227,7 +227,10 @@ export class SeparationListComponent implements OnInit {
   }
 
   loadInitialData(): void {
-    this.crud.listAll('employees').subscribe({ next: (data) => this.employees.set(data || []) });
+    this.crud.listAll('employees').subscribe({
+      next: (data) => this.employees.set(data || []),
+      error: () => this.toast.error('Failed to load employees'),
+    });
   }
 
   loadPage(page: number): void {
@@ -312,6 +315,8 @@ export class SeparationListComponent implements OnInit {
         this.confirmDelete.set(null);
         this.loadPage(this.currentPage());
       },
+      error: () => this.toast.error('Failed to delete'),
+    });
     });
   }
 }

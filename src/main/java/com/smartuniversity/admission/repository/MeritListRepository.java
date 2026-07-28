@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface MeritListRepository extends JpaRepository<MeritList, Long> {
     List<MeritList> findByCircularIdAndPublishedTrue(Long circularId);
+    List<MeritList> findByCircularIdAndPublishedFalse(Long circularId);
     List<MeritList> findByCircularIdAndDepartmentIdAndPublishedTrue(Long circularId, Long departmentId);
     Optional<MeritList> findByApplicantId(Long applicantId);
 }

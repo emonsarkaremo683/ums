@@ -72,6 +72,7 @@ export class NotificationSocketService implements OnDestroy {
             this.unreadCount = res.data.totalElements;
           }
         },
+        error: () => {},
       });
   }
 

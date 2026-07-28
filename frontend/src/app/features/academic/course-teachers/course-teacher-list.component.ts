@@ -185,9 +185,18 @@ export class CourseTeacherListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPage(0);
-    this.crud.listAll<Course>('courses').subscribe({ next: (d) => this.courses.set(d) });
-    this.crud.listAll<Employee>('employees/active').subscribe({ next: (d) => this.employees.set(d) });
-    this.crud.listAll<AcademicSession>('academic-sessions').subscribe({ next: (d) => this.sessions.set(d) });
+    this.crud.listAll<Course>('courses').subscribe({
+      next: (d) => this.courses.set(d),
+      error: () => this.toast.error('Failed to load courses'),
+    });
+    this.crud.listAll<Employee>('employees/active').subscribe({
+      next: (d) => this.employees.set(d),
+      error: () => this.toast.error('Failed to load employees'),
+    });
+    this.crud.listAll<AcademicSession>('academic-sessions').subscribe({
+      next: (d) => this.sessions.set(d),
+      error: () => this.toast.error('Failed to load sessions'),
+    });
   }
 
   loadPage(page: number): void {

@@ -12,7 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -78,6 +80,12 @@ public class EmployeeService {
 
     public Page<EmployeeResponse> getAll(Pageable pageable) {
         return employeeRepository.findAll(pageable).map(mapper::toResponse);
+    }
+
+    public List<EmployeeResponse> getAllActive() {
+        return employeeRepository.findByActiveTrue().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional

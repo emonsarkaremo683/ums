@@ -24,6 +24,9 @@ public class FileController {
     @GetMapping("/{pathToFile:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String pathToFile) {
         Path filePath = uploadRoot.resolve(pathToFile).normalize();
+        if (!filePath.startsWith(uploadRoot)) {
+            return ResponseEntity.badRequest().build();
+        }
         Resource resource = new FileSystemResource(filePath);
 
         if (!resource.exists()) {
